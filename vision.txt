@@ -1,0 +1,137 @@
+# Personal AI Assistant – Vision Doc
+
+## Goal
+Build a personal AI assistant that can:
+1. **Ingest and index data** from:
+   - Local files on my Mac (PDF, TXT, DOCX, Markdown, etc.).
+   - Google Suite (Gmail, Calendar, Docs/Sheets).
+2. **Answer natural language questions** by fuzzy-searching relevant documents and summarizing them.
+3. **Perform actions (push updates)**, such as:
+   - Reading Gmail for meeting mentions and creating corresponding Google Calendar events.
+
+UI is not a priority — CLI interaction is sufficient.
+
+---
+
+## High-Level Architecture
+
+### Components
+1. **Data Ingestion Layer**
+   - Local files: use a document loader (e.g. `unstructured`, `PyMuPDF`, `python-docx`).
+   - Google Suite:
+     - Gmail API → fetch emails.
+     - Google Calendar API → fetch events, create/update events.
+     - Google Drive API → fetch Docs/Sheets.
+
+2. **Indexing & Storage**
+   - Use an embedding model to convert text into vectors.
+   - Store embeddings in a local vector database (`chromadb` or `faiss`).
+   - Store metadata (file path, email ID, calendar event ID) alongside embeddings.
+
+3. **Query & Reasoning**
+   - User inputs a natural language query in CLI.
+   - System retrieves relevant snippets from vector DB.
+   - LLM generates an answer based on retrieved data.
+   - If query requires action (e.g., “add to calendar”), system calls the relevant API.
+
+4. **Orchestration**
+   - Use LangChain or LlamaIndex for retrieval & reasoning pipeline.
+   - Actions exposed as “tools” (e.g., `search_gmail`, `create_calendar_event`).
+   - LLM decides when to call tools vs. when to answer directly.
+
+---
+
+## Workflow Examples
+
+### Q&A
+**User:**
+"Hey, I see a strategy session on my calendar for next week. Can you pull up the related email and summarize it?"
+
+yaml
+Copy code
+
+**System flow:**
+1. Calendar API → get events next week.
+2. Match “strategy session” to event metadata.
+3. Use event keywords to search Gmail vector index.
+4. Retrieve emails → pass into LLM for summarization.
+5. Return concise answer in CLI.
+
+---
+
+### Action
+**User:**
+"Check my email and add any meetings mentioned to my calendar."
+
+markdown
+Copy code
+
+**System flow:**
+1. Gmail API → fetch latest emails.
+2. LLM parses for meeting details (title, date, time).
+3. Calendar API → create new events with parsed info.
+4. Return confirmation in CLI.
+
+---
+
+## Technical Stack
+- **Language:** Python 3.11+
+- **Core Libraries:**
+  - Vector DB: `chromadb` (local, persistent).
+  - Embeddings: OpenAI `text-embedding-3-large` (or local model via `sentence-transformers`).
+  - Orchestration: LangChain or LlamaIndex.
+  - Google APIs: `google-api-python-client`, `google-auth`.
+  - File parsing: `unstructured`, `PyPDF2`, `python-docx`.
+
+- **LLM:**
+  - Default: OpenAI GPT-4.1/5 (API).
+  - Option: Local model via `ollama` (e.g., LLaMA 3).
+
+- **Interface:**
+  - Command-line script (`assistant.py`).
+  - Input: user query as string.
+  - Output: assistant’s answer + references.
+
+---
+
+## Data Flow
+1. **Ingestion**
+   - Run `python ingest.py --local ~/Documents --gmail --calendar`.
+   - Text extracted → embeddings computed → stored in vector DB.
+
+2. **Querying**
+   - Run `python assistant.py "Summarize the email about my strategy session next week"`.
+   - Assistant retrieves from DB + APIs → responds.
+
+3. **Actions**
+   - Assistant decides when to call Gmail/Calendar APIs to modify data.
+
+---
+
+## Security & Privacy
+- Store all embeddings + cache locally.
+- OAuth for Google APIs (user’s own account).
+- No data sent to external services except embeddings/queries if using OpenAI.
+
+---
+
+## Deliverables (MVP)
+1. **CLI ingestion tool**
+   - Index local folder + Gmail + Calendar.
+
+2. **CLI assistant tool**
+   - Accepts natural language queries.
+   - Returns answers with sources.
+   - Can create calendar events from email content.
+
+3. **Config file (`config.yaml`)**
+   - Paths for local ingestion.
+   - Model choice (OpenAI vs local).
+   - Google API credentials.
+
+---
+
+## Stretch Goals
+- Index Google Docs & Sheets.
+- Automatic periodic sync (cron job).
+- Simple web dashboard (Flask/FastAPI).
