@@ -1,0 +1,39 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="personal-ai-retrieval",
+    version="0.1.0",
+    description="Personal AI assistant for indexing and querying local files and Google Suite data",
+    author="Personal AI Assistant",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    python_requires=">=3.11",
+    install_requires=[
+        "python-dotenv>=1.0.0",
+        "pyyaml>=6.0",
+        "click>=8.1.0",
+        "rich>=13.0.0",
+        "chromadb>=0.4.0",
+        "sentence-transformers>=2.2.0",
+        "openai>=1.0.0",
+        "unstructured>=0.10.0",
+        "pypdf2>=3.0.0",
+        "python-docx>=0.8.11",
+        "markdown>=3.5.0",
+        "google-api-python-client>=2.100.0",
+        "google-auth>=2.20.0",
+        "google-auth-oauthlib>=1.0.0",
+        "google-auth-httplib2>=0.1.0",
+        "langchain>=0.1.0",
+        "langchain-openai>=0.1.0",
+        "langchain-community>=0.1.0",
+        "requests>=2.31.0",
+        "tqdm>=4.66.0",
+    ],
+    entry_points={
+        "console_scripts": [
+            "pai-assistant=personal_ai.cli.assistant:main",
+            "pai-ingest=personal_ai.cli.ingest:main",
+        ],
+    },
+)

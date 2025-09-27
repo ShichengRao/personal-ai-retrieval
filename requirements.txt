@@ -1,0 +1,32 @@
+# Core dependencies
+python-dotenv>=1.0.0
+pyyaml>=6.0
+click>=8.1.0
+rich>=13.0.0
+
+# Vector database and embeddings
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+openai>=1.0.0
+
+# Document processing
+unstructured>=0.10.0
+pypdf2>=3.0.0
+python-docx>=0.8.11
+markdown>=3.5.0
+
+# Google APIs
+google-api-python-client>=2.100.0
+google-auth>=2.20.0
+google-auth-oauthlib>=1.0.0
+google-auth-httplib2>=0.1.0
+
+# LLM and AI
+langchain>=0.1.0
+langchain-openai>=0.1.0
+langchain-community>=0.1.0
+
+# Utilities
+requests>=2.31.0
+tqdm>=4.66.0
+pathlib>=1.0.1
