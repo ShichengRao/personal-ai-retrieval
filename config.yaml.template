@@ -1,0 +1,74 @@
+# Personal AI Assistant Configuration Template
+# Copy this file to config.yaml and fill in your values
+
+# OpenAI Configuration (optional - will fall back to local models if not provided)
+openai:
+  api_key: "your-openai-api-key-here"
+  model: "gpt-4"
+  embedding_model: "text-embedding-3-large"
+
+# Local Embedding Model (used as fallback or primary)
+local_embeddings:
+  model_name: "all-MiniLM-L6-v2"
+  device: "cpu"  # or "cuda" if you have GPU
+
+# Vector Database Configuration
+vector_db:
+  persist_directory: "./data/chroma_db"
+  collection_name: "personal_docs"
+
+# Google API Configuration
+google:
+  credentials_file: "./credentials/google_credentials.json"
+  token_file: "./credentials/google_token.json"
+  scopes:
+    - "https://www.googleapis.com/auth/gmail.readonly"
+    - "https://www.googleapis.com/auth/calendar"
+    - "https://www.googleapis.com/auth/drive.readonly"
+
+# Local File Indexing
+local_files:
+  paths:
+    - "~/Documents"
+    - "~/Desktop"
+  file_types:
+    - ".pdf"
+    - ".txt"
+    - ".docx"
+    - ".md"
+    - ".py"
+  exclude_patterns:
+    - "*.tmp"
+    - "*.log"
+    - ".git/*"
+    - "node_modules/*"
+
+# Gmail Configuration
+gmail:
+  max_emails: 1000
+  days_back: 30
+  include_sent: true
+  include_drafts: false
+
+# Calendar Configuration
+calendar:
+  days_back: 30
+  days_forward: 90
+  include_declined: false
+
+# Text Processing
+text_processing:
+  chunk_size: 1000
+  chunk_overlap: 200
+  max_tokens_per_chunk: 8000
+
+# Query Configuration
+query:
+  max_results: 10
+  similarity_threshold: 0.7
+  include_metadata: true
+
+# Logging
+logging:
+  level: "INFO"
+  file: "./logs/assistant.log"
