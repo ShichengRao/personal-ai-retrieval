@@ -9,13 +9,15 @@ A powerful personal AI assistant that indexes your local files and Google Suite 
 - **AI-Powered Responses**: Get intelligent answers with source attribution
 - **Action Capabilities**: Create calendar events, analyze emails for meetings, and more
 - **CLI Interface**: Easy-to-use command-line tools for ingestion and querying
-- **Flexible Configuration**: Support for both OpenAI and local embedding models
+- **Multiple LLM Support**: Works with OpenAI GPT-4, Claude 3.5 Sonnet, and local models
+- **Flexible Configuration**: Support for both cloud and local embedding models
 
 ## 📋 Requirements
 
 - Python 3.11+
 - Google API credentials (for Gmail/Calendar/Drive integration)
-- OpenAI API key (optional, for advanced AI features)
+- OpenAI API key (optional, for GPT-4 features)
+- Claude API key (optional, alternative to OpenAI)
 
 ## 🛠️ Installation
 
@@ -56,10 +58,11 @@ A powerful personal AI assistant that indexes your local files and Google Suite 
    - Create credentials (OAuth 2.0 Client ID)
    - Download the JSON file and save as `credentials/google_credentials.json`
 
-3. **Configure OpenAI (optional)**:
+3. **Configure LLM APIs (optional)**:
    ```bash
    # Add to .env file
    OPENAI_API_KEY=your-openai-api-key-here
+   CLAUDE_API_KEY=your-claude-api-key-here
    ```
 
 4. **Edit configuration**:
@@ -82,6 +85,11 @@ A powerful personal AI assistant that indexes your local files and Google Suite 
    calendar:
      days_back: 30
      days_forward: 90
+   
+   # Choose your preferred LLM
+   llm:
+     prefer_claude: false  # Set to true for Claude
+     prefer_openai: true   # Set to false if using Claude
    ```
 
 ## 🔄 Data Ingestion
@@ -171,12 +179,21 @@ The assistant can handle various types of natural language queries:
 
 ## 🔧 Advanced Configuration
 
-### Embedding Models
+### LLM Configuration
 
-**OpenAI Embeddings** (Recommended):
+**Claude (Anthropic)**:
+```yaml
+claude:
+  api_key: "your-claude-key"
+  model: "claude-3-5-sonnet-20241022"
+  max_tokens: 4000
+```
+
+**OpenAI GPT**:
 ```yaml
 openai:
-  api_key: "your-key"
+  api_key: "your-openai-key"
+  model: "gpt-4"
   embedding_model: "text-embedding-3-large"
 ```
 
@@ -185,6 +202,13 @@ openai:
 local_embeddings:
   model_name: "all-MiniLM-L6-v2"
   device: "cpu"  # or "cuda"
+```
+
+**LLM Preferences**:
+```yaml
+llm:
+  prefer_claude: true   # Use Claude as primary LLM
+  prefer_openai: false  # Use OpenAI as fallback
 ```
 
 ### Text Processing

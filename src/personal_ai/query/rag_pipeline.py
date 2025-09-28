@@ -35,18 +35,36 @@ class RAGPipeline:
     
     def _initialize_llm_client(self):
         """Initialize LLM client based on configuration."""
-        try:
-            api_key = config.openai_api_key
-            if api_key:
+        self.llm_client = None
+        self.llm_type = None
+        
+        # Try Claude first if API key is available
+        claude_key = config.get('claude.api_key')
+        if claude_key:
+            try:
+                import anthropic
+                self.llm_client = anthropic.Anthropic(api_key=claude_key)
+                self.llm_type = 'claude'
+                logger.info("Initialized Claude client")
+                return
+            except Exception as e:
+                logger.warning(f"Failed to initialize Claude client: {e}")
+        
+        # Fall back to OpenAI
+        openai_key = config.openai_api_key
+        if openai_key:
+            try:
                 from openai import OpenAI
-                self.llm_client = OpenAI(api_key=api_key)
+                self.llm_client = OpenAI(api_key=openai_key)
+                self.llm_type = 'openai'
                 logger.info("Initialized OpenAI client")
-            else:
-                logger.warning("No OpenAI API key found. LLM features will be limited.")
-                self.llm_client = None
-        except Exception as e:
-            logger.error(f"Failed to initialize LLM client: {e}")
-            self.llm_client = None
+                return
+            except Exception as e:
+                logger.warning(f"Failed to initialize OpenAI client: {e}")
+        
+        logger.warning("No LLM API keys found. LLM features will be limited.")
+        self.llm_client = None
+        self.llm_type = None
     
     def answer_query(
         self,
@@ -182,12 +200,97 @@ class RAGPipeline:
             Generated answer
         """
         try:
-            # Build messages for the conversation
-            messages = []
+            if self.llm_type == 'claude':
+                return self._generate_claude_answer(query, context, conversation_history)
+            elif self.llm_type == 'openai':
+                return self._generate_openai_answer(query, context, conversation_history)
+            else:
+                return self._generate_extractive_answer(query, [])
+                
+        except Exception as e:
+            logger.error(f"Error generating LLM answer: {e}")
+            return self._generate_extractive_answer(query, [])
+    
+    def _generate_claude_answer(
+        self,
+        query: str,
+        context: str,
+        conversation_history: Optional[List[Dict[str, str]]] = None
+    ) -> str:
+        """Generate answer using Claude.
+        
+        Args:
+            query: User query
+            context: Retrieved context
+            conversation_history: Previous conversation
             
-            # System message
-            system_prompt = """You are a helpful AI assistant that answers questions based on the provided context. 
+        Returns:
+            Generated answer
+        """
+        # Build conversation for Claude
+        messages = []
+        
+        # Add conversation history if provided
+        if conversation_history:
+            for msg in conversation_history[-5:]:  # Include last 5 messages
+                messages.append({
+                    "role": msg["role"],
+                    "content": msg["content"]
+                })
+        
+        # Build the main prompt with context
+        main_prompt = f"""You are a helpful AI assistant that answers questions based on the provided context.
+
+Guidelines:
+- Answer based primarily on the provided context
+- If the context doesn't contain enough information, say so clearly
+- Be concise but comprehensive
+- Include specific details from the context when relevant
+- If asked about meetings, emails, or calendar events, extract specific details like dates, times, and participants
+- For action requests (like "add to calendar"), acknowledge the request but explain that you can suggest the action
+
+Context:
+{context}
+
+Question: {query}"""
+        
+        messages.append({
+            "role": "user",
+            "content": main_prompt
+        })
+        
+        # Generate response with Claude
+        response = self.llm_client.messages.create(
+            model=config.get('claude.model', 'claude-3-5-sonnet-20241022'),
+            max_tokens=config.get('claude.max_tokens', 500),
+            temperature=0.1,  # Low temperature for factual responses
+            messages=messages
+        )
+        
+        return response.content[0].text.strip()
+    
+    def _generate_openai_answer(
+        self,
+        query: str,
+        context: str,
+        conversation_history: Optional[List[Dict[str, str]]] = None
+    ) -> str:
+        """Generate answer using OpenAI.
+        
+        Args:
+            query: User query
+            context: Retrieved context
+            conversation_history: Previous conversation
             
+        Returns:
+            Generated answer
+        """
+        # Build messages for the conversation
+        messages = []
+        
+        # System message
+        system_prompt = """You are a helpful AI assistant that answers questions based on the provided context. 
+        
 Guidelines:
 - Answer based primarily on the provided context
 - If the context doesn't contain enough information, say so clearly
@@ -198,36 +301,32 @@ Guidelines:
 
 Context:
 {context}"""
-            
-            messages.append({
-                "role": "system",
-                "content": system_prompt.format(context=context)
-            })
-            
-            # Add conversation history if provided
-            if conversation_history:
-                for msg in conversation_history[-5:]:  # Include last 5 messages
-                    messages.append(msg)
-            
-            # Add current query
-            messages.append({
-                "role": "user",
-                "content": query
-            })
-            
-            # Generate response
-            response = self.llm_client.chat.completions.create(
-                model=config.openai_model,
-                messages=messages,
-                max_tokens=500,
-                temperature=0.1  # Low temperature for factual responses
-            )
-            
-            return response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            logger.error(f"Error generating LLM answer: {e}")
-            return self._generate_extractive_answer(query, [])
+        
+        messages.append({
+            "role": "system",
+            "content": system_prompt.format(context=context)
+        })
+        
+        # Add conversation history if provided
+        if conversation_history:
+            for msg in conversation_history[-5:]:  # Include last 5 messages
+                messages.append(msg)
+        
+        # Add current query
+        messages.append({
+            "role": "user",
+            "content": query
+        })
+        
+        # Generate response
+        response = self.llm_client.chat.completions.create(
+            model=config.openai_model,
+            messages=messages,
+            max_tokens=500,
+            temperature=0.1  # Low temperature for factual responses
+        )
+        
+        return response.choices[0].message.content.strip()
     
     def _generate_extractive_answer(self, query: str, search_results: List[Dict[str, Any]]) -> str:
         """Generate extractive answer from search results.

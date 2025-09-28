@@ -27,6 +27,7 @@ setup(
         "langchain>=0.1.0",
         "langchain-openai>=0.1.0",
         "langchain-community>=0.1.0",
+        "anthropic>=0.7.0",
         "requests>=2.31.0",
         "tqdm>=4.66.0",
     ],

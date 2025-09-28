@@ -422,11 +422,20 @@ pai-assistant status
 ### Main Configuration (`config.yaml`)
 
 ```yaml
-# OpenAI Configuration
+# LLM Configuration
 openai:
   api_key: string
   model: string (default: "gpt-4")
   embedding_model: string (default: "text-embedding-3-large")
+
+claude:
+  api_key: string
+  model: string (default: "claude-3-5-sonnet-20241022")
+  max_tokens: integer (default: 4000)
+
+llm:
+  prefer_claude: boolean (default: false)
+  prefer_openai: boolean (default: true)
 
 # Local Embeddings
 local_embeddings:
@@ -484,8 +493,9 @@ logging:
 ### Environment Variables (`.env`)
 
 ```bash
-# OpenAI
+# LLM APIs
 OPENAI_API_KEY=string
+CLAUDE_API_KEY=string
 
 # Google
 GOOGLE_CREDENTIALS_FILE=string
