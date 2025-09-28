@@ -1,11 +1,23 @@
 # Personal AI Assistant Configuration Template
 # Copy this file to config.yaml and fill in your values
 
+# LLM Configuration (choose one or both)
 # OpenAI Configuration (optional - will fall back to local models if not provided)
 openai:
   api_key: "your-openai-api-key-here"
   model: "gpt-4"
   embedding_model: "text-embedding-3-large"
+
+# Claude Configuration (optional - alternative to OpenAI)
+claude:
+  api_key: "your-claude-api-key-here"
+  model: "claude-3-5-sonnet-20241022"
+  max_tokens: 4000
+
+# LLM Preferences (choose which LLM to prefer)
+llm:
+  prefer_claude: false  # Set to true to prefer Claude over OpenAI
+  prefer_openai: true   # Set to false if you want to use Claude as primary
 
 # Local Embedding Model (used as fallback or primary)
 local_embeddings:

@@ -7,7 +7,8 @@ This guide will walk you through setting up the Personal AI Retrieval System fro
 - Python 3.11 or higher
 - Git
 - Google account (for Gmail/Calendar/Drive integration)
-- OpenAI account (optional, for advanced AI features)
+- OpenAI account (optional, for GPT-4 features)
+- Anthropic account (optional, for Claude features)
 
 ## Step 1: Installation
 
@@ -86,8 +87,9 @@ cp .env.template .env
 
 Edit `.env` file:
 ```bash
-# OpenAI API Key (optional)
+# LLM API Keys (optional - choose one or both)
 OPENAI_API_KEY=your-openai-api-key-here
+CLAUDE_API_KEY=your-claude-api-key-here
 
 # Google API Credentials
 GOOGLE_CREDENTIALS_FILE=./credentials/google_credentials.json
@@ -106,11 +108,23 @@ LOG_FILE=./logs/assistant.log
 Edit `config.yaml`:
 
 ```yaml
-# OpenAI Configuration (optional)
+# LLM Configuration (choose one or both)
+# OpenAI Configuration
 openai:
   api_key: "your-openai-api-key-here"  # Or use environment variable
   model: "gpt-4"
   embedding_model: "text-embedding-3-large"
+
+# Claude Configuration (alternative to OpenAI)
+claude:
+  api_key: "your-claude-api-key-here"
+  model: "claude-3-5-sonnet-20241022"
+  max_tokens: 4000
+
+# LLM Preferences
+llm:
+  prefer_claude: false  # Set to true to prefer Claude
+  prefer_openai: true   # Set to false if using Claude as primary
 
 # Local Embedding Model (fallback)
 local_embeddings:
@@ -272,9 +286,11 @@ pai-ingest gmail --max-emails 1
 
 ### Embedding Issues
 
-**Error: "OpenAI API key not found"**
-- Either add OpenAI API key to `.env` file
+**Error: "No LLM API key found"**
+- Add either OpenAI or Claude API key to `.env` file
 - Or let the system fall back to local embeddings (slower but free)
+- Claude API keys can be obtained from [Anthropic Console](https://console.anthropic.com/)
+- OpenAI API keys can be obtained from [OpenAI Platform](https://platform.openai.com/)
 
 **Error: "Model download failed"**
 ```bash

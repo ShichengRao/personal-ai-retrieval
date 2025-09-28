@@ -5,6 +5,7 @@ from typing import Optional
 from .base import EmbeddingService
 from .openai_embeddings import OpenAIEmbeddings
 from .local_embeddings import LocalEmbeddings
+from .claude_embeddings import ClaudeEmbeddings
 from ..utils.config import config
 from ..utils.logging import get_logger
 
@@ -13,20 +14,35 @@ logger = get_logger(__name__)
 
 def create_embedding_service(
     prefer_openai: bool = True,
+    prefer_claude: bool = False,
     openai_api_key: Optional[str] = None,
+    claude_api_key: Optional[str] = None,
     local_model: Optional[str] = None
 ) -> EmbeddingService:
     """Create an embedding service with automatic fallback.
     
     Args:
-        prefer_openai: Whether to prefer OpenAI over local models
+        prefer_openai: Whether to prefer OpenAI over other models
+        prefer_claude: Whether to prefer Claude-enhanced embeddings
         openai_api_key: OpenAI API key override
+        claude_api_key: Claude API key override
         local_model: Local model name override
         
     Returns:
         EmbeddingService instance
     """
-    # Try OpenAI first if preferred and API key is available
+    # Try Claude-enhanced embeddings if preferred and API key is available
+    if prefer_claude:
+        claude_key = claude_api_key or config.get('claude.api_key')
+        if claude_key:
+            try:
+                logger.info("Attempting to use Claude-enhanced embeddings")
+                return ClaudeEmbeddings(api_key=claude_key, local_model=local_model)
+            except Exception as e:
+                logger.warning(f"Failed to initialize Claude embeddings: {e}")
+                logger.info("Falling back to other options")
+    
+    # Try OpenAI if preferred and API key is available
     if prefer_openai:
         api_key = openai_api_key or config.openai_api_key
         if api_key:

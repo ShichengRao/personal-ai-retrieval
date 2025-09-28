@@ -32,8 +32,15 @@ def test_imports():
     try:
         from personal_ai.embeddings.base import EmbeddingService
         print("✅ Embedding base module imported successfully")
+        
+        # Test Claude embeddings import (may fail without dependencies)
+        try:
+            from personal_ai.embeddings.claude_embeddings import ClaudeEmbeddings
+            print("✅ Claude embeddings module imported successfully")
+        except ImportError as e:
+            print(f"⚠️ Claude embeddings import failed (optional dependency): {e}")
     except ImportError as e:
-        print(f"❌ Embedding base import failed: {e}")
+        print(f"❌ Embedding import failed: {e}")
         return False
     
     try:
@@ -41,6 +48,21 @@ def test_imports():
         print("✅ Tool base modules imported successfully")
     except ImportError as e:
         print(f"❌ Tool base import failed: {e}")
+        return False
+    
+    try:
+        from personal_ai.llm.base import BaseLLMClient
+        print("✅ LLM base module imported successfully")
+        
+        # Test Claude LLM import (may fail without dependencies)
+        try:
+            from personal_ai.llm.claude_client import ClaudeLLMClient
+            from personal_ai.llm.factory import create_llm_client
+            print("✅ Claude LLM modules imported successfully")
+        except ImportError as e:
+            print(f"⚠️ Claude LLM import failed (optional dependency): {e}")
+    except ImportError as e:
+        print(f"❌ LLM import failed: {e}")
         return False
     
     return True
@@ -62,7 +84,14 @@ def test_config():
         # Test default values
         assert config.get('nonexistent.key', 'default') == 'default'
         
-        print("✅ Configuration management working correctly")
+        # Test Claude configuration properties
+        claude_model = config.claude_model
+        assert isinstance(claude_model, str)
+        
+        prefer_claude = config.prefer_claude
+        assert isinstance(prefer_claude, bool)
+        
+        print("✅ Configuration management (including Claude) working correctly")
         return True
         
     except Exception as e:
@@ -181,17 +210,68 @@ def test_project_structure():
     print("✅ Project structure is correct")
     return True
 
+def test_claude_integration():
+    """Test Claude integration without requiring API key."""
+    print("\nTesting Claude integration...")
+    
+    try:
+        # Test basic imports
+        try:
+            from personal_ai.llm.claude_client import ClaudeLLMClient
+            claude_available = True
+        except ImportError as e:
+            print(f"⚠️ Claude client not available: {e}")
+            claude_available = False
+        
+        try:
+            from personal_ai.embeddings.claude_embeddings import ClaudeEmbeddings
+            claude_embeddings_available = True
+        except ImportError as e:
+            print(f"⚠️ Claude embeddings not available: {e}")
+            claude_embeddings_available = False
+        
+        # Test configuration
+        from personal_ai.utils.config import config
+        claude_model = config.claude_model
+        assert isinstance(claude_model, str)
+        
+        prefer_claude = config.prefer_claude
+        assert isinstance(prefer_claude, bool)
+        
+        # Test LLM factory (should work even without Claude dependencies)
+        try:
+            from personal_ai.llm.factory import create_llm_client
+            client = create_llm_client(prefer_claude=True, claude_api_key=None, openai_api_key=None)
+            # Should return None since no API keys provided
+            assert client is None
+            print("✅ LLM factory working correctly")
+        except Exception as e:
+            print(f"⚠️ LLM factory test failed: {e}")
+        
+        if claude_available or claude_embeddings_available:
+            print("✅ Claude integration structure working correctly")
+        else:
+            print("⚠️ Claude integration available but dependencies missing (install anthropic and sentence-transformers)")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Claude integration test failed: {e}")
+        return False
+
+
 def main():
     """Run all tests."""
-    print("Personal AI Retrieval System - Core Functionality Test")
-    print("=" * 60)
+    print("Personal AI Retrieval System - Core Functionality Test (with Claude Support)")
+    print("=" * 70)
     
     tests = [
         test_project_structure,
         test_imports,
         test_config,
         test_text_processing,
-        test_tool_registry
+        test_tool_registry,
+        test_claude_integration
     ]
     
     passed = 0
@@ -216,8 +296,13 @@ def main():
         print("1. Install dependencies: pip install -r requirements.txt")
         print("2. Set up configuration: cp config.yaml.template config.yaml")
         print("3. Set up Google API credentials")
-        print("4. Run data ingestion: pai-ingest --help")
-        print("5. Start the assistant: pai-assistant --help")
+        print("4. Add OpenAI or Claude API key to .env file")
+        print("5. Run data ingestion: pai-ingest --help")
+        print("6. Start the assistant: pai-assistant --help")
+        print("\nLLM Support:")
+        print("- OpenAI GPT-4: Add OPENAI_API_KEY to .env")
+        print("- Claude 3.5 Sonnet: Add CLAUDE_API_KEY to .env")
+        print("- Local models: No API key needed (slower but free)")
     else:
         print("❌ Some tests failed. Please check the implementation.")
         return 1

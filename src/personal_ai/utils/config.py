@@ -46,6 +46,10 @@ class Config:
         if os.getenv('OPENAI_API_KEY'):
             config.setdefault('openai', {})['api_key'] = os.getenv('OPENAI_API_KEY')
         
+        # Claude configuration
+        if os.getenv('CLAUDE_API_KEY'):
+            config.setdefault('claude', {})['api_key'] = os.getenv('CLAUDE_API_KEY')
+        
         # Google credentials
         if os.getenv('GOOGLE_CREDENTIALS_FILE'):
             config.setdefault('google', {})['credentials_file'] = os.getenv('GOOGLE_CREDENTIALS_FILE')
@@ -159,6 +163,31 @@ class Config:
             'https://www.googleapis.com/auth/calendar',
             'https://www.googleapis.com/auth/drive.readonly'
         ])
+    
+    @property
+    def claude_api_key(self) -> Optional[str]:
+        """Get Claude API key."""
+        return self.get('claude.api_key')
+    
+    @property
+    def claude_model(self) -> str:
+        """Get Claude model name."""
+        return self.get('claude.model', 'claude-3-5-sonnet-20241022')
+    
+    @property
+    def claude_max_tokens(self) -> int:
+        """Get Claude max tokens."""
+        return self.get('claude.max_tokens', 4000)
+    
+    @property
+    def prefer_claude(self) -> bool:
+        """Check if Claude is preferred over OpenAI."""
+        return self.get('llm.prefer_claude', False)
+    
+    @property
+    def prefer_openai(self) -> bool:
+        """Check if OpenAI is preferred over Claude."""
+        return self.get('llm.prefer_openai', True)
 
 
 # Global config instance
