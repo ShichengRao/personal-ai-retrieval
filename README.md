@@ -34,14 +34,34 @@ A powerful personal AI assistant that indexes your local files and Google Suite 
    ```
 
 3. **Install dependencies**:
+   
+   **Option A: Minimal install (recommended for quick start)**:
    ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Install the package**:
-   ```bash
+   pip install -r requirements-minimal.txt
    pip install -e .
    ```
+   
+   **Option B: Full install with local models**:
+   ```bash
+   # For better compatibility, install PyTorch first
+   pip install torch torchvision torchaudio
+   pip install -r requirements.txt
+   pip install -e .
+   ```
+   
+   **Option C: Using conda (recommended for ML dependencies)**:
+   ```bash
+   conda install pytorch torchvision torchaudio -c pytorch
+   pip install -r requirements.txt
+   pip install -e .
+   ```
+
+4. **Verify installation**:
+   ```bash
+   python test_core.py
+   ```
+
+> **Having installation issues?** See [INSTALL_TROUBLESHOOTING.md](INSTALL_TROUBLESHOOTING.md) for detailed solutions.
 
 ## ⚙️ Configuration
 
