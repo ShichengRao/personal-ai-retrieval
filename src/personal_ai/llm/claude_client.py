@@ -22,7 +22,7 @@ class ClaudeLLMClient(BaseLLMClient):
             model: Model name. If None, uses config value
         """
         self.api_key = api_key or config.get('claude.api_key')
-        self.model = model or config.get('claude.model', 'claude-3-5-sonnet-20241022')
+        self.model = model or config.get('claude.model', 'claude-sonnet-4-5')
         
         if not self.api_key:
             raise ValueError("Claude API key is required")
@@ -186,8 +186,10 @@ class ClaudeLLMClient(BaseLLMClient):
     @property
     def supports_tools(self) -> bool:
         """Check if the model supports tool/function calling."""
-        # Claude 3.5 Sonnet and newer models support tools
-        return 'claude-3' in self.model.lower() or 'sonnet' in self.model.lower()
+        # Claude 3.5 Sonnet, Claude 4.5 Sonnet and newer models support tools
+        return ('claude-3' in self.model.lower() or 
+                'claude-sonnet-4' in self.model.lower() or 
+                'sonnet' in self.model.lower())
     
     def analyze_text(self, text: str, analysis_type: str = "summary") -> str:
         """Use Claude for text analysis tasks.

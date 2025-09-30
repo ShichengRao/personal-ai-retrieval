@@ -31,7 +31,7 @@ class ClaudeEmbeddings(LocalEmbeddings):
             local_model: Local embedding model name for vector generation
         """
         self.api_key = api_key or config.get('claude.api_key')
-        self.claude_model = model or config.get('claude.model', 'claude-3-5-sonnet-20241022')
+        self.claude_model = model or config.get('claude.model', 'claude-sonnet-4-5')
         
         # Initialize local embeddings for vector generation
         super().__init__(model_name=local_model)

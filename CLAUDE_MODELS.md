@@ -4,9 +4,16 @@ This document lists the correct model names for Claude API integration.
 
 ## Current Claude Models (as of December 2024)
 
-### Claude 3.5 Sonnet (Latest)
+### Claude Sonnet 4.5 (Latest - Dec 19, 2024)
+- **Model Name**: `claude-sonnet-4-5`
+- **Description**: Best coding model in the world, strongest for complex agents
+- **Best for**: Coding, complex reasoning, using computers, math
+- **Max tokens**: 4096 output, 200k context
+- **Pricing**: $3/$15 per million tokens
+
+### Claude 3.5 Sonnet
 - **Model Name**: `claude-3-5-sonnet-20241022`
-- **Description**: Latest and most capable Claude model
+- **Description**: Previous flagship model
 - **Best for**: Complex reasoning, coding, analysis
 - **Max tokens**: 4096 output, 200k context
 
@@ -36,7 +43,15 @@ This document lists the correct model names for Claude API integration.
 
 ## Configuration Examples
 
-### For Latest Claude 3.5 Sonnet (Recommended)
+### For Latest Claude Sonnet 4.5 (Recommended)
+```yaml
+claude:
+  api_key: "your-claude-api-key"
+  model: "claude-sonnet-4-5"
+  max_tokens: 4000
+```
+
+### For Claude 3.5 Sonnet
 ```yaml
 claude:
   api_key: "your-claude-api-key"
@@ -69,14 +84,14 @@ claude:
 
 ## Common Mistakes
 
-❌ **Wrong**: `claude-sonnet-4-5`
-✅ **Correct**: `claude-3-5-sonnet-20241022`
+❌ **Wrong**: `claude-4.5-sonnet`
+✅ **Correct**: `claude-sonnet-4-5`
 
-❌ **Wrong**: `claude-3.5-sonnet`
-✅ **Correct**: `claude-3-5-sonnet-20241022`
+❌ **Wrong**: `claude-sonnet-4.5`
+✅ **Correct**: `claude-sonnet-4-5`
 
-❌ **Wrong**: `claude-3-5-sonnet`
-✅ **Correct**: `claude-3-5-sonnet-20241022`
+❌ **Wrong**: `claude-4-5-sonnet`
+✅ **Correct**: `claude-sonnet-4-5`
 
 ## Checking Available Models
 
