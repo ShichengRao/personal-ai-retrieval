@@ -68,4 +68,17 @@ def get_default_embedding_service() -> EmbeddingService:
     Returns:
         EmbeddingService instance
     """
-    return create_embedding_service()
+    # Check if user has a preference in config
+    prefer_claude = config.get('llm.prefer_claude', False)
+    prefer_openai = config.get('llm.prefer_openai', True)
+    
+    # If Claude is preferred and available, use Claude-enhanced embeddings
+    if prefer_claude and config.get('claude.api_key'):
+        prefer_claude_embeddings = True
+    else:
+        prefer_claude_embeddings = False
+    
+    return create_embedding_service(
+        prefer_openai=prefer_openai,
+        prefer_claude=prefer_claude_embeddings
+    )

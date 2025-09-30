@@ -126,9 +126,9 @@ class ClaudeEmbeddings(LocalEmbeddings):
     def model_name(self) -> str:
         """Get the name of the embedding model."""
         if self.claude_client:
-            return f"claude-enhanced-{super().model_name}"
+            return f"claude-enhanced-{self._model_name}"
         else:
-            return super().model_name
+            return self._model_name
     
     def analyze_text_with_claude(self, text: str, analysis_type: str = "summary") -> str:
         """Use Claude for text analysis tasks.

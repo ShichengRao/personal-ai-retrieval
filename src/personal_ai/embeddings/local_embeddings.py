@@ -20,13 +20,13 @@ class LocalEmbeddings(EmbeddingService):
             model_name: Model name. If None, uses config value
             device: Device to run on ('cpu', 'cuda'). If None, uses config value
         """
-        self.model_name = model_name or config.local_embedding_model
+        self._model_name = model_name or config.local_embedding_model
         self.device = device or config.get('local_embeddings.device', 'cpu')
         
-        logger.info(f"Loading local embedding model: {self.model_name} on {self.device}")
+        logger.info(f"Loading local embedding model: {self._model_name} on {self.device}")
         
         try:
-            self.model = SentenceTransformer(self.model_name, device=self.device)
+            self.model = SentenceTransformer(self._model_name, device=self.device)
             logger.info(f"Successfully loaded model with dimension: {self.dimension}")
         except Exception as e:
             logger.error(f"Error loading local embedding model: {e}")
@@ -72,4 +72,4 @@ class LocalEmbeddings(EmbeddingService):
     @property
     def model_name(self) -> str:
         """Get the name of the embedding model."""
-        return self.model_name
+        return self._model_name
