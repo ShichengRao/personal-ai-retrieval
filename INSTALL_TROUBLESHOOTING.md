@@ -10,6 +10,22 @@ This guide helps resolve common installation issues with the Personal AI Retriev
 
 **Solution Options**:
 
+### 2. NumPy 2.x Compatibility Issues
+
+**Error**: `A module that was compiled using NumPy 1.x cannot be run in NumPy 2.3.3 as it may crash`
+
+**Solution**: Downgrade NumPy to 1.x
+```bash
+pip install "numpy<2.0.0"
+# Then reinstall other packages
+pip install --force-reinstall torch sentence-transformers
+```
+
+**Alternative**: Use the fixed requirements
+```bash
+pip install -r requirements.txt  # Now includes numpy<2.0.0
+```
+
 #### Option A: Use Minimal Requirements (Recommended for Quick Start)
 ```bash
 # Install minimal dependencies (no local embeddings)
@@ -201,6 +217,7 @@ If you continue to have issues:
 | Error | Solution |
 |-------|----------|
 | `No module named 'torch'` | Install PyTorch first: `pip install torch` |
+| `NumPy 1.x cannot be run in NumPy 2.x` | Downgrade NumPy: `pip install "numpy<2.0.0"` |
 | `Microsoft Visual C++ 14.0 is required` (Windows) | Install Visual Studio Build Tools |
 | `Failed building wheel for chromadb` | Install build tools: `pip install wheel setuptools` |
 | `No module named 'sentence_transformers'` | Use minimal requirements or install PyTorch first |
