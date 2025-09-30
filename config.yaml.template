@@ -11,7 +11,7 @@ openai:
 # Claude Configuration (optional - alternative to OpenAI)
 claude:
   api_key: "your-claude-api-key-here"
-  model: "claude-3-5-sonnet-20241022"
+  model: "claude-sonnet-4-5"  # Latest Claude 4.5 Sonnet (Dec 2024)
   max_tokens: 4000
 
 # LLM Preferences (choose which LLM to prefer)

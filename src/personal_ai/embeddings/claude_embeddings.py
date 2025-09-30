@@ -31,7 +31,7 @@ class ClaudeEmbeddings(LocalEmbeddings):
             local_model: Local embedding model name for vector generation
         """
         self.api_key = api_key or config.get('claude.api_key')
-        self.claude_model = model or config.get('claude.model', 'claude-3-5-sonnet-20241022')
+        self.claude_model = model or config.get('claude.model', 'claude-sonnet-4-5')
         
         # Initialize local embeddings for vector generation
         super().__init__(model_name=local_model)
@@ -126,9 +126,9 @@ class ClaudeEmbeddings(LocalEmbeddings):
     def model_name(self) -> str:
         """Get the name of the embedding model."""
         if self.claude_client:
-            return f"claude-enhanced-{super().model_name}"
+            return f"claude-enhanced-{self._model_name}"
         else:
-            return super().model_name
+            return self._model_name
     
     def analyze_text_with_claude(self, text: str, analysis_type: str = "summary") -> str:
         """Use Claude for text analysis tasks.

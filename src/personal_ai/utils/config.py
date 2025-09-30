@@ -172,7 +172,7 @@ class Config:
     @property
     def claude_model(self) -> str:
         """Get Claude model name."""
-        return self.get('claude.model', 'claude-3-5-sonnet-20241022')
+        return self.get('claude.model', 'claude-sonnet-4-5')
     
     @property
     def claude_max_tokens(self) -> int:
